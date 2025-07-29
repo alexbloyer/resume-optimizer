@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Resume Optimizer</title>
+  <style>
+    :root {
+      --bg-light: #f3e8ff;
+      --bg-dark: #1e1e2f;
+      --card-light: #ffffff;
+      --card-dark: #2b2b3d;
+      --text-light: #374151;
+      --text-dark: #e5e7eb;
+      --input-light: #f9fafb;
+      --input-dark: #3b3b4f;
+      --border-light: #cbd5e1;
+      --border-dark: #4b5563;
+      --accent-light: #6366f1;
+      --accent-dark: #8b5cf6;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: var(--bg-light);
+      color: var(--text-light);
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      transition: background 0.3s, color 0.3s;
+    }
+
+    body.dark {
+      background-color: var(--bg-dark);
+      color: var(--text-dark);
+    }
+
+    .form-card {
+      background-color: var(--card-light);
+      padding: 2rem 2.5rem;
+      border-radius: 1rem;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 650px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+    }
+
+    body.dark .form-card {
+      background-color: var(--card-dark);
+    }
+
+    h4 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent-light);
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 0.3rem;
+    }
+
+    body.dark h4 {
+      color: var(--accent-dark);
+      border-bottom: 1px solid var(--border-dark);
+    }
+
+    label {
+      font-weight: 500;
+      display: block;
+      margin-bottom: 0.3rem;
+    }
+
+    .drop-zone {
+      border: 2px dashed var(--accent-light);
+      border-radius: 0.5rem;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      background-color: var(--input-light);
+      transition: background 0.3s;
+    }
+
+    .drop-zone:hover {
+      background-color: #eef2ff;
+    }
+
+    body.dark .drop-zone {
+      border-color: var(--accent-dark);
+      background-color: var(--input-dark);
+    }
+
+    .drop-zone input[type="file"] {
+      display: none;
+    }
+
+    textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-light);
+      font-size: 0.95rem;
+      background-color: var(--input-light);
+      resize: vertical;
+      height: 100px;
+    }
+
+    body.dark textarea {
+      background-color: var(--input-dark);
+      border: 1px solid var(--border-dark);
+    }
+
+    button[type="submit"] {
+      padding: 0.75rem 1.25rem;
+      background: linear-gradient(to right, var(--accent-light), var(--accent-dark));
+      border: none;
+      color: white;
+      font-weight: 600;
+      border-radius: 0.6rem;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .toggle-theme {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      padding: 0.5rem 1rem;
+      font-size: 0.9rem;
+      background-color: transparent;
+      border: 2px solid var(--accent-light);
+      border-radius: 8px;
+      color: var(--accent-light);
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    body.dark .toggle-theme {
+      color: var(--accent-dark);
+      border-color: var(--accent-dark);
+    }
+
+    .spinner {
+      display: none;
+      margin-top: 1rem;
+      border: 4px solid #ccc;
+      border-top: 4px solid var(--accent-light);
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      animation: spin 1s linear infinite;
+      align-self: center;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .error {
+      color: red;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <button class="toggle-theme" onclick="toggleTheme()">🌗 Toggle Theme</button>
+
+  <form class="form-card" method="POST" enctype="multipart/form-data" onsubmit="return handleSubmit(event)">
+    <h4>Resume</h4>
+    <div>
+      <label>Upload Resume (PDF):</label>
+      <div class="drop-zone" onclick="document.getElementById('resume_file').click()" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'resume_file')">
+        Drop or click to upload
+        <input type="file" id="resume_file" name="resume_file" accept="application/pdf">
+      </div>
+    </div>
+
+    <div>
+      <label>Or paste your resume here:</label>
+      <textarea name="resume_text" placeholder="Paste your resume..."></textarea>
+    </div>
+
+    <h4>Job Description</h4>
+    <div>
+      <label>Upload Job Description (PDF):</label>
+      <div class="drop-zone" onclick="document.getElementById('job_file').click()" ondragover="event.preventDefault()" ondrop="handleDrop(event, 'job_file')">
+        Drop or click to upload
+        <input type="file" id="job_file" name="job_file" accept="application/pdf">
+      </div>
+    </div>
+
+    <div>
+      <label>Or paste job description here:</label>
+      <textarea name="job_text" placeholder="Paste job description..."></textarea>
+    </div>
+
+    <div class="error" id="error-message"></div>
+
+    <button type="submit">Analyze</button>
+    <div class="spinner" id="spinner"></div>
+  </form>
+
+  <script>
+    function toggleTheme() {
+      document.body.classList.toggle('dark');
+      localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark' : 'light');
+    }
+
+    (function () {
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark');
+      }
+    })();
+
+    function handleDrop(event, inputId) {
+      event.preventDefault();
+      const fileInput = document.getElementById(inputId);
+      fileInput.files = event.dataTransfer.files;
+    }
+
+    function handleSubmit(event) {
+      const resumeFile = document.getElementById('resume_file').files.length;
+      const resumeText = document.querySelector('[name="resume_text"]').value.trim();
+      const jobFile = document.getElementById('job_file').files.length;
+      const jobText = document.querySelector('[name="job_text"]').value.trim();
+      const errorDiv = document.getElementById('error-message');
+
+      // Validate that at least one source per section is filled
+      if (!(resumeFile || resumeText) || !(jobFile || jobText)) {
+        errorDiv.textContent = "Please provide both a resume and job description (either upload or paste).";
+        event.preventDefault();
+        return false;
+      }
+
+      errorDiv.textContent = "";
+      document.getElementById('spinner').style.display = 'block';
+      return true;
+    }
+  </script>
+</body>
+</html>
