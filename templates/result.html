@@ -28,9 +28,9 @@
 </head>
 <body>
   <div class="card">
-    <h2>Match Score</h2>
-    <div class="score">{{ match_score }}%</div>
-    <p>Based on keyword overlap between your resume and job description.</p>
+    <h2>Resume Match Score</h2>
+    <div class="score">{{ (match_score * 100) | round(2) }}%</div>
+    <p>Based on the cosine similarity between embeddings of your resume and job description.</p>
     <a href="/">🔁 Try Again</a>
   </div>
 </body>

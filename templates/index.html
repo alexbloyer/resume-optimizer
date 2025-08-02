@@ -29,12 +29,16 @@
       justify-content: center;
       align-items: center;
       min-height: 100vh;
-      transition: background 0.3s, color 0.3s;
+      transition: background 0.2s, color 0.2s;
     }
 
     body.dark {
       background-color: var(--bg-dark);
       color: var(--text-dark);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
     }
 
     .form-card {
@@ -167,7 +171,7 @@
   </style>
 </head>
 <body>
-  <button class="toggle-theme" onclick="toggleTheme()">🌗 Toggle Theme</button>
+  <button class="toggle-theme" onclick="toggleTheme()"> Toggle dark mode</button>
 
   <form class="form-card" method="POST" enctype="multipart/form-data" onsubmit="return handleSubmit(event)">
     <h4>Resume</h4>

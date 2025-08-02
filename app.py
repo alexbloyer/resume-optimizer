@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash
 import fitz  # PyMuPDF
 import os
 from werkzeug.utils import secure_filename
+from sentence_transformers import SentenceTransformer, util
 
 app = Flask(__name__)
 app.secret_key = "263a8233986c09fdda317eba81cd8eba"
@@ -60,7 +61,6 @@ def index():
             flash("You must provide both a resume and job description (file or text).")
             return redirect(url_for("index"))
 
-        # 🔍 Placeholder for model analysis
         match_score = analyze_resume_job_fit(resume_data, job_data)
 
         return render_template("result.html", match_score=match_score)
@@ -68,12 +68,11 @@ def index():
     return render_template("index.html")
 
 def analyze_resume_job_fit(resume, job):
-    # Placeholder analysis logic: word match ratio
-    resume_words = set(resume.lower().split())
-    job_words = set(job.lower().split())
-    overlap = resume_words.intersection(job_words)
-    score = len(overlap) / len(job_words) * 100 if job_words else 0
-    return round(score, 2)
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    resume_vec = model.encode(resume, convert_to_tensor=True)
+    job_vec = model.encode(job, convert_to_tensor=True)
+    similarity = util.pytorch_cos_sim(resume_vec, job_vec)
+    return similarity.item()
 
 if __name__ == "__main__":
     os.makedirs(UPLOAD_FOLDER, exist_ok=True)
